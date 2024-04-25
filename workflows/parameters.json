@@ -1,0 +1,6 @@
+{
+  "asset-target-bucket": {
+    "type": "String",
+    "value": "target-file/assets"
+  }
+}

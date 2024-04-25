@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Formatting files in terraform folder structure.
+# Formatting should run before all other verifications
+echo "Formatting all files in folders"
+
+# Formatting options
+RED='\033[0;31m'
+BOLD=$(tput bold)
+
+
+formatted_files=$(terraform fmt -recursive)
+echo "Format files completed"
+
+if [[ -n "$formatted_files" ]]
+then
+    echo "adding below files to git stage :: $formatted_files"
+    git add $formatted_files
+    echo -e "${RED}${BOLD}Repository files have been formatted and staged. Please review, and run git commit again"
+    exit -1
+fi
+echo -e "Pre commit was successful. Proceeding with committing the changes to the branch..... "

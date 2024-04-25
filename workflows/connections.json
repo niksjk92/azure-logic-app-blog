@@ -1,0 +1,31 @@
+{
+  "serviceProviderConnections": {
+    "AzureBlob": {
+      "displayName": "storage-account-connection",
+      "parameterSetName": "ManagedServiceIdentity",
+      "parameterValues": {
+        "authProvider": {
+          "Type": "ManagedServiceIdentity"
+        },
+        "blobStorageEndpoint": "@appsetting('AzureBlob_blobStorageEndpoint')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/AzureBlob"
+      }
+    },
+    "Sftp": {
+      "displayName": "file-connection-assets",
+      "parameterValues": {
+        "disableConnectionCache": "@appsetting('Sftp_11_disableConnectionCache')",
+        "portNumber": "@appsetting('Sftp_portNumber')",
+        "rootDirectory": "@appsetting('Sftp_rootDirectory_assets')",
+        "sshHostAddress": "@appsetting('Sftp_sshHostAddress')",
+        "sshPrivateKey": "@appsetting('Sftp_rss_key')",
+        "username": "@appsetting('Sftp_username')"
+      },
+      "serviceProvider": {
+        "id": "/serviceProviders/Sftp"
+      }
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "definition": {
+    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+    "actions": {
+      "For_each": {
+        "actions": {
+          "Parse_JSON": {
+            "inputs": {
+              "content": "@items('For_each')",
+              "schema": {
+                "properties": {
+                  "content": {
+                    "properties": {
+                      "$content": {
+                        "type": "string"
+                      },
+                      "$content-type": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "fileMetadata": {
+                    "properties": {
+                      "lastUpdatedTime": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "pathRelativeToRootDirectory": {
+                        "type": "string"
+                      },
+                      "size": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "ParseJson"
+          },
+          "Upload_blob_to_storage_container": {
+            "inputs": {
+              "parameters": {
+                "blobName": "@body('Parse_JSON')?['fileMetadata']?['name']",
+                "containerName": "@parameters('asset-target-bucket')",
+                "content": "@body('Parse_JSON')?['content']"
+              },
+              "serviceProviderConfiguration": {
+                "connectionName": "AzureBlob",
+                "operationId": "uploadBlob",
+                "serviceProviderId": "/serviceProviders/AzureBlob"
+              }
+            },
+            "runAfter": {
+              "Parse_JSON": [
+                "SUCCEEDED"
+              ]
+            },
+            "runtimeConfiguration": {
+              "secureData": {
+                "properties": [
+                  "inputs",
+                  "outputs"
+                ]
+              }
+            },
+            "type": "ServiceProvider"
+          }
+        },
+        "foreach": "@triggerBody()",
+        "runAfter": {},
+        "type": "Foreach"
+      }
+    },
+    "contentVersion": "1.0.0.0",
+    "outputs": {},
+    "triggers": {
+      "When_files_are_added_or_updated": {
+        "inputs": {
+          "parameters": {
+            "folderPath": "out/@{formatDateTime(utcNow(), 'yyyy-MM-dd')}",
+            "includeFileContent": true,
+            "maxFileCount": 100
+          },
+          "serviceProviderConfiguration": {
+            "connectionName": "Sftp",
+            "operationId": "whenFilesAreAddedOrModified",
+            "serviceProviderId": "/serviceProviders/Sftp"
+          }
+        },
+        "kind": "Polling",
+        "recurrence": {
+          "frequency": "Minute",
+          "interval": 1
+        },
+        "type": "ServiceProvider"
+      }
+    }
+  },
+  "kind": "Stateful"
+}
